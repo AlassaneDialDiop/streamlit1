@@ -1,64 +1,119 @@
+import openai
 import streamlit as st
-import torch
-import wikipedia
-import transformers
-from tokenizers import Tokenizer
-from transformers import pipeline, Pipeline 
+from streamlit_chat import message
+from PIL import Image
+import os 
+import pandas as pd
+from io import StringIO, BytesIO
+import requests
+
+from st_pages import show_pages_from_config, add_page_title
+
+# Either this or add_indentation() MUST be called on each page in your
+# app to add indendation in the sidebar
+add_page_title()
+
+show_pages_from_config()
+openai.api_key = st.secrets["openai_api_key"]
+
+def generate_response( productpage_input, productmainimage_input):
+
+    with open('./assets/prompt1.txt', 'r') as file:
+        prompt_og_txt = file.read()
+        prompt_txt = prompt_og_txt
+        prompt_txt = prompt_txt.replace('<<<productpage>>>', productpage_input)
+        prompt_txt = prompt_txt.replace('<<<productmainimage>>>', productmainimage_input)
+
+        # print(prompt_txt)
+
+        completion=openai.Completion.create(
+            engine='text-davinci-003',
+            prompt=prompt_txt,
+            max_tokens=512,
+            n=1,
+            stop=None,
+            temperature=0.6,
+        )
+        message=completion.choices[0].text
+        return message
+
+#######
+aldo_logo = Image.open('./assets/aldo_logo.png')
+st.image(aldo_logo, width = 100)
 
 
-if not st.session_state["password_correct_global"]:
-    st.error("You need to be logged in to access this page.")
-    st.stop()
+st.title("Color labeling products with GPT4")
 
-@st.cache(hash_funcs={Tokenizer: lambda _: None}, allow_output_mutation=True)
-def load_qa_pipeline() -> Pipeline:
-    qa_pipeline = pipeline("question-answering", model="distilbert-base-uncased-distilled-squad")
-    return qa_pipeline
 
-@st.cache
-def load_wiki_summary(query: str) -> str:
-    results = wikipedia.search(query)
-    summary = wikipedia.summary(results[0], sentences=10)
-    return summary
+#storing the chat
+if 'generated' not in st.session_state:
+    st.session_state['generated'] = []
+if 'past' not in st.session_state:
+    st.session_state['past'] = []
 
-def answer_question(pipeline: Pipeline, question: str, paragraph: str) -> dict:
-    input = {
-        "question": question,
-        "context": paragraph
-    }
-    output = pipeline(input)
-    return output
+st.markdown("""---""")
 
-# Main app engine
-if __name__ == "__main__":
-    # display title and description
-    st.title("Wikipedia Question Answering")
-    st.write("Search topic, Ask questions, Get Answers")
+productpage_input=st.text_input("Product page url:",key='productpage_input')
+st.write("Example: https://www.aldoshoes.com/ca/en/women/jermeyyx-black/p/13559413")
+st.markdown("""---""")
 
-    # display topic input slot
-    topic = st.text_input("SEARCH TOPIC", "")
+productmainimage_input=st.text_input("Product main image url:",key='productmainimage_input')
+st.write("Example: https://media.aldoshoes.com/v3/product/jermeyyx/007-002-043/jermeyyx_black_007-002-043_main_sq_gy_1000x1000.jpg")
+st.markdown("""---""")
 
-    # display article paragraph
-    article_paragraph = st.empty()
+if productpage_input and productmainimage_input:
+    output=generate_response( productpage_input, productmainimage_input)
 
-    # display question input slot
-    question = st.text_input("QUESTION", "")
+    # Get the csv part
+    delim = 'Final output as csv:'
+    csv_string_part = output.partition(delim)[2]
 
-    if topic:
-        # load wikipedia summary of topic
-        summary = load_wiki_summary(topic)
+    print("csv_string_part is : \n")
 
-        # display article summary in paragraph
-        article_paragraph.markdown(summary)
+    print(csv_string_part)
 
-        # perform question answering
-        if question != "":
-            # load question answering pipeline
-            qa_pipeline = load_qa_pipeline()
+    # Display Main image
 
-            # answer query question using article summary
-            result = answer_question(qa_pipeline, question, summary)
-            answer = result["answer"]
+    response = requests.get(productmainimage_input)
+    productmainimage_image = Image.open(BytesIO(response.content))
+    st.image(productmainimage_image, width = 300)
 
-            # display answer
-            st.write(answer)
+
+    # Convert String into StringIO
+    csvStringIO = StringIO(csv_string_part)
+
+    # Then into df
+    df = pd.read_csv(csvStringIO, sep=",", header=0)
+
+    df.columns.values[0] = "Color_from_GPT"
+    df.columns.values[1] = "Color_from_GPT_main"
+    df.columns.values[2] = "Color_from_GPT_alt1"
+    df.columns.values[3] = "Color_from_GPT_alt2"
+    df.columns.values[4] = "Color_from_GPT_alt3"
+    df.columns.values[5] = "Style"
+    df.columns.values[6] = "Official_color"
+    
+    Color_from_GPT = df['Color_from_GPT'][0].strip()
+    Official_color = df['Official_color'][0].strip()
+
+    if Color_from_GPT == Official_color:
+        df['Alert'] = 'No - GPT agrees'
+    if Color_from_GPT != Official_color:
+        df['Alert'] = 'Yes - GPT disagrees'
+
+    df = df[['Alert', 'Style', 'Official_color', 'Color_from_GPT', 
+             'Color_from_GPT_main', 'Color_from_GPT_alt1', 'Color_from_GPT_alt2',
+               'Color_from_GPT_alt3']]
+
+    # Display an interactive table
+    st.dataframe(df)
+
+    #store the output
+    st.session_state['past'].append(productpage_input)
+    st.session_state['generated'].append(output)
+if st.session_state['generated']:
+    for i in range(len(st.session_state['generated'])-1, -1, -1):
+        message(st.session_state["generated"][i], key=str(i))
+        message(st.session_state['past'][i], is_user=True, key=str(i) + '_user')
+
+

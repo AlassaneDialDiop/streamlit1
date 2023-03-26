@@ -13,6 +13,8 @@ seaborn = "*"
 missingno = "*"
 openpyxl = "*"
 plotly = "*"
+openai = "*"
+streamlit-chat = "*"
 
 [dev-packages]
 

@@ -1,0 +1,86 @@
+You are given a link to an ALDO product, either shoe or handbag and the link to its main image in the catalog.
+
+The purpose of the task I am asking you here is to make sure the product receives a color label that makes sense for a customer seeing the product on the website and wondering which color label makes more sense for the product.
+Just focus on the images you will identify following the instructions I give you. Ignore of the text in the webpage.
+
+Your task is to search in the webpage the 4 images that have in their URLs the text ‘main_sq’ , the text ‘alt1_sq’, the text ‘alt2_sq’ and the text ‘alt3_sq’. Once you have those images, apply some alterations to the images and then determine the appropriate color label for the product according to each image.
+Include in your answer the color label based on each image and then make a final decision for what is the appropriate label to assign to the product on the website. 
+Verify that the urls you include in your answer work fine and we can load the images using a browser like Google chrome with a public account.
+
+
+Here are 10 color labels that can be assigned to the product 'Beige', Blue, 'Black', 'Brown', 'Green', Purple', 'Pink/Red', 'Silver/Grey', 'White', 'Yellow/Gold'.
+A 11th option is here whenever the color label isn’t obvious, as there might be more than one color in the altered images.  This 11th option is called ‘Multi’.
+You have to return one of these 11 options in your answer. 
+If ‘main_sq’, ‘alt1’ , ‘alt2’ , ‘alt3’ don’t give the same color label then just assign ‘Mutli’ as the final color label to select.
+
+The alterations to apply to the image should mirror the way it is done in Adobe Photoshop CS6.
+The list of the alteration to apply is the following:
+1. Remove the background and only keep the image of the product.
+2. Decrease the saturation of the purple color range by 60% and increase the saturation of the green color range by 60%.
+3. Increase the value of the yellow color range by 60% and decrease the magenta and cyan color ranges by 60% for the color balance adjustment.
+
+Here is the link to the product webpage.
+<<<productpage>>>
+Here is the link to its main image in the catalog.
+<<<productmainimage>>>
+
+
+You will use the link to the main image in the catalog to determine the links to the images ‘alt1’, ‘alt2’, and ‘alt3’
+
+
+I give you 3 examples here.
+
+Example 1
+The link to the product is https://www.aldoshoes.com/ca/en/men/zirnuflex-blue/p/13390093
+The link to the image with ‘main_sq’ is https://media.aldoshoes.com/v3/product/zirnuflex/460-001-043/zirnuflex_blue_460-001-043_main_sq_gy_1200x1200.jpg
+Color of main_sq : ‘Blue’
+The link to the image with ‘alt1_sq’ is https://media.aldoshoes.com/v3/product/zirnuflex/460-001-043/zirnuflex_blue_460-001-043_alt1_sq_nt_2000x2000.jpg
+Color of alt1: ‘Blue’
+The link to the image with ‘alt2_sq’ is https://media.aldoshoes.com/v3/product/zirnuflex/460-001-043/zirnuflex_blue_460-001-043_alt2_sq_nt_400x400.jpg
+Color of alt2: ‘Blue’
+The link to the image with ‘alt3_sq’ is h https://media.aldoshoes.com/v3/product/zirnuflex/460-001-043/zirnuflex_blue_460-001-043_alt3_sq_nt_400x400.jpg
+Color of alt3: ‘Blue’
+Color_final (Considering main_sq, alt1, alt2, alt3) : ‘Blue’
+Style_name : zirnuflex
+Official_color: ‘Blue’
+Final output as csv:
+Color_final, Color_main_sq, Color_alt1, Color_alt2, Color_alt3, style_name, official_color
+‘Blue’, ‘Blue’, ‘Blue’, ‘Blue’, ‘Blue’, ‘zirnuflex’, ‘Blue’
+
+
+Example 2
+The link to the product is https://www.aldoshoes.com/ca/en/men/westfield-gris/p/13469955
+The link to the image with ‘main_sq’ is https://media.aldoshoes.com/v3/product/westfield/050-001-031/westfield_grey_050-001-031_main_sq_gy_2000x2000.jpg
+Color of main_sq : 'Silver/Grey'
+The link to the image with ‘alt1_sq’ is https://media.aldoshoes.com/v3/product/westfield/050-001-031/westfield_grey_050-001-031_alt1_sq_gy_2000x2000.jpg
+Color of alt1: 'Silver/Grey'
+The link to the image with ‘alt2_sq’ is https://media.aldoshoes.com/v3/product/westfield/050-001-031/westfield_grey_050-001-031_alt2_sq_gy_2000x2000.jpg
+Color of alt2: 'Silver/Grey'
+The link to the image with ‘alt3_sq’ is https://media.aldoshoes.com/v3/product/westfield/050-001-031/westfield_grey_050-001-031_alt3_sq_gy_2000x2000.jpg
+Color of alt3: 'Silver/Grey'
+Color_final (Considering main_sq, alt1, alt2, alt3) : 'Silver/Grey'
+Style_name : ‘westfield’
+Official_color: 'Grey'
+Final output as csv:
+Color_final, Color_main_sq, Color_alt1, Color_alt2, Color_alt3, style_name, official_color
+'Silver/Grey', 'Silver/Grey', 'Silver/Grey', 'Silver/Grey', 'Silver/Grey', ‘westfield’, ‘Grey’
+
+
+Example 3
+The link to the product is https://www.aldoshoes.com/ca/en/women/theallia-purple/p/13601174
+The link to the image with ‘main_sq’ is https://media.aldoshoes.com/v3/product/theallia/540-002-029/theallia_purple_540-002-029_alt1_sq_gy_2000x2000.jpg
+Color of main_sq : ‘Purple’
+The link to the image with ‘alt1_sq’ is https://media.aldoshoes.com/v3/product/theallia/540-002-029/theallia_purple_540-002-029_alt1_sq_gy_2000x2000.jpg
+Color of alt1: ‘Purple’
+The link to the image with ‘alt2_sq’ is https://media.aldoshoes.com/v3/product/theallia/540-002-029/theallia_purple_540-002-029_alt2_sq_gy_2000x2000.jpg
+Color of alt2: ‘Multi’
+The link to the image with ‘alt3_sq’ is https://media.aldoshoes.com/v3/product/theallia/540-002-029/theallia_purple_540-002-029_alt3_sq_gy_2000x2000.jpg
+Color of alt3: ‘Purple’
+Considering main_sq, alt1, alt2, alt3 : ‘Multi’
+Style_name : zirnuflex
+Official_color: ‘Purple’
+Final output as csv:
+Color_final, Color_main_sq, Color_alt1, Color_alt2, Color_alt3, style_name, official_color
+‘Multi, ‘Purple’, ‘Purple’, ‘Multi’, ‘Purple’, ‘theallia’, ‘Purple’
+
+
