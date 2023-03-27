@@ -15,6 +15,7 @@ openpyxl = "*"
 plotly = "*"
 openai = "*"
 streamlit-chat = "*"
+st-pages = "*"
 
 [dev-packages]
 

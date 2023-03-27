@@ -3,13 +3,13 @@ import streamlit as st
 from streamlit_chat import message
 import os 
 
+###
 from st_pages import show_pages_from_config, add_page_title
-
 # Either this or add_indentation() MUST be called on each page in your
 # app to add indendation in the sidebar
 add_page_title()
-
 show_pages_from_config()
+###
 
 openai.api_key = st.secrets["openai_api_key"]
 
@@ -27,7 +27,6 @@ def generate_response(prompt):
 
 #######
 
-st.title("ChatGPT-like Web App")
 #storing the chat
 if 'generated' not in st.session_state:
     st.session_state['generated'] = []

@@ -7,11 +7,13 @@ import pandas as pd
 from io import StringIO, BytesIO
 import requests
 
+###
 from st_pages import show_pages_from_config, add_page_title
-
 # Either this or add_indentation() MUST be called on each page in your
 # app to add indendation in the sidebar
 add_page_title()
+show_pages_from_config()
+###
 
 show_pages_from_config()
 openai.api_key = st.secrets["openai_api_key"]
@@ -42,22 +44,20 @@ aldo_logo = Image.open('./assets/aldo_logo.png')
 st.image(aldo_logo, width = 100)
 
 
-st.title("Color labeling products with GPT4")
-
-
 #storing the chat
 if 'generated' not in st.session_state:
     st.session_state['generated'] = []
 if 'past' not in st.session_state:
     st.session_state['past'] = []
 
-st.markdown("""---""")
 
-productpage_input=st.text_input("Product page url:",key='productpage_input')
+productpage_input=st.text_input("Product page url:",key='productpage_input'
+ ,value="https://www.aldoshoes.com/ca/en/women/jermeyyx-black/p/13559413")
 st.write("Example: https://www.aldoshoes.com/ca/en/women/jermeyyx-black/p/13559413")
 st.markdown("""---""")
 
-productmainimage_input=st.text_input("Product main image url:",key='productmainimage_input')
+productmainimage_input=st.text_input("Product main image url:",key='productmainimage_input'
+ ,value="https://media.aldoshoes.com/v3/product/jermeyyx/007-002-043/jermeyyx_black_007-002-043_main_sq_gy_1000x1000.jpg")
 st.write("Example: https://media.aldoshoes.com/v3/product/jermeyyx/007-002-043/jermeyyx_black_007-002-043_main_sq_gy_1000x1000.jpg")
 st.markdown("""---""")
 
@@ -71,12 +71,6 @@ if productpage_input and productmainimage_input:
     print("csv_string_part is : \n")
 
     print(csv_string_part)
-
-    # Display Main image
-
-    response = requests.get(productmainimage_input)
-    productmainimage_image = Image.open(BytesIO(response.content))
-    st.image(productmainimage_image, width = 300)
 
 
     # Convert String into StringIO
@@ -107,6 +101,13 @@ if productpage_input and productmainimage_input:
 
     # Display an interactive table
     st.dataframe(df)
+
+    # Display Main image
+    response = requests.get(productmainimage_input)
+    productmainimage_image = Image.open(BytesIO(response.content))
+    st.image(productmainimage_image, width = 400, caption = df['Style'][0] )
+
+
 
     #store the output
     st.session_state['past'].append(productpage_input)

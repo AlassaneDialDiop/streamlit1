@@ -1,1 +1,2 @@
-/.streamlit/secrets.toml
+# Streamlit secret should be ignored
+.streamlit/secrets.toml

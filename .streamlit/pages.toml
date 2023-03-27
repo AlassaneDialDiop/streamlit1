@@ -9,11 +9,11 @@ icon = ":books:"
 is_section = true
 
 [[pages]]
-path = "pages/Generic_ChatGPT.py"
+path = "Generic_ChatGPT.py"
 name = "Generic_ChatGPT"
 icon = "🤖"
 
 [[pages]]
-path = "pages/Color_labeling_products_with_GPT4.py"
+path = "Color_labeling_products_with_GPT4.py"
 name = "Color_labeling_products_with_GPT4"
 icon = "🚀"
