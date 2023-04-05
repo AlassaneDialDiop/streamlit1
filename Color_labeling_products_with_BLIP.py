@@ -6,7 +6,6 @@ import os
 import pandas as pd
 from io import StringIO, BytesIO
 import requests
-
 ###
 from st_pages import show_pages_from_config, add_page_title
 # Either this or add_indentation() MUST be called on each page in your
@@ -14,28 +13,52 @@ from st_pages import show_pages_from_config, add_page_title
 add_page_title()
 show_pages_from_config()
 ###
+from lavis.models import load_model_and_preprocess
+import torch
+#
+
+model, vis_processors, txt_processors = load_model_and_preprocess(name="blip_vqa", model_type="vqav2", is_eval=True, device=device)
+# ask a random question.
+question = "Which city is this photo taken?"
+image = vis_processors["eval"](raw_image).unsqueeze(0).to(device)
+question = txt_processors["eval"](question)
+model.predict_answers(samples={"image": image, "text_input": question}, inference_method="generate")
+# ['singapore']
+
 
 show_pages_from_config()
-openai.api_key = st.secrets["openai_api_key"]
+
+def load_sample_image(image_path):
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    # load sample image
+    raw_image = Image.open("docs/_static/merlion.png").convert("RGB")
+    return device, raw_image
+
+# setup device to use
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+# load sample image
+raw_image = Image.open("docs/_static/merlion.png").convert("RGB")
 
 def generate_response( productpage_input, productmainimage_input):
 
     with open('./assets/prompt1.txt', 'r') as file:
-        prompt_og_txt = file.read()
-        prompt_txt = prompt_og_txt
-        prompt_txt = prompt_txt.replace('<<<productpage>>>', productpage_input)
-        prompt_txt = prompt_txt.replace('<<<productmainimage>>>', productmainimage_input)
+        # prompt_og_txt = file.read()
+        # prompt_txt = prompt_og_txt
+        # prompt_txt = prompt_txt.replace('<<<productpage>>>', productpage_input)
+        # prompt_txt = prompt_txt.replace('<<<productmainimage>>>', productmainimage_input)
 
-        # print(prompt_txt)
 
-        completion=openai.Completion.create(
-            engine='text-davinci-002',
-            prompt=prompt_txt,
-            max_tokens=512,
-            n=1,
-            stop=None,
-            temperature=0.6,
-        )
+        prompt_txt = productpage_input
+
+        print(prompt_txt)
+
+        model, vis_processors, txt_processors = load_model_and_preprocess(name="blip_vqa", model_type="vqav2", is_eval=True, device=device)
+        # ask a random question.
+        question = "Which city is this photo taken?"
+        image = vis_processors["eval"](raw_image).unsqueeze(0).to(device)
+        question = txt_processors["eval"](question)
+        model.predict_answers(samples={"image": image, "text_input": question}, inference_method="generate")
+        # ['singapore']
         message=completion.choices[0].text
         return message
 
